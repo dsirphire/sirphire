@@ -10,7 +10,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ---------- Force Light Modern UI CSS ----------
+# ---------- Light UI CSS ----------
 st.markdown("""
 <style>
 :root {
@@ -28,20 +28,12 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 }
 
 .block-container {
-    padding-top: 1.8rem;
+    padding-top: 1.4rem;
     padding-bottom: 2rem;
     max-width: 1080px;
 }
 
-#MainMenu {
-    visibility: hidden;
-}
-
-footer {
-    visibility: hidden;
-}
-
-header {
+#MainMenu, footer, header {
     visibility: hidden;
 }
 
@@ -58,10 +50,10 @@ p, li, span, div, label {
 .app-card {
     background: linear-gradient(180deg, #ffffff 0%, #fffdfd 100%) !important;
     border: 1px solid #f0dede;
-    border-radius: 7px;
-    padding: 30px 32px;
-    box-shadow: 0 2px 8px rgba(25, 25, 25, 0.018);
-    margin-bottom: 24px;
+    border-radius: 10px;
+    padding: 26px 28px;
+    box-shadow: 0 1px 6px rgba(25, 25, 25, 0.012);
+    margin-bottom: 22px;
     position: relative;
     overflow: hidden;
 }
@@ -82,15 +74,15 @@ p, li, span, div, label {
     color: #d92d37 !important;
     border: 1px solid #ffd8d8;
     padding: 8px 14px;
-    border-radius: 7px;
+    border-radius: 8px;
     font-size: 0.82rem;
     font-weight: 600;
     letter-spacing: 0.03em;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
 }
 
 .app-title {
-    font-size: 3rem;
+    font-size: 2.8rem;
     font-weight: 700;
     color: #1f2937 !important;
     margin-bottom: 10px;
@@ -104,69 +96,45 @@ p, li, span, div, label {
 }
 
 .app-subtitle {
-    font-size: 1.12rem;
+    font-size: 1.08rem;
     color: #4b5563 !important;
-    line-height: 1.65;
+    line-height: 1.55;
     margin-bottom: 0;
     font-weight: 400;
     max-width: 760px;
 }
 
-/* ---------- Category Cards Compact ---------- */
-.category-title-main {
-    font-size: 1.25rem;
+/* ---------- Section Titles ---------- */
+.section-title {
+    font-size: 1.3rem;
     font-weight: 600;
     color: #1f2937 !important;
-    margin-top: 6px;
-    margin-bottom: 10px;
+    margin-top: 8px;
+    margin-bottom: 12px;
 }
 
-.category-card {
-    background: #ffffff !important;
-    border: 1px solid #eceff3;
-    border-radius: 12px;
-    padding: 14px 14px;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.015);
-    min-height: 88px;
-    margin-bottom: 8px;
-}
-
-.category-card.active {
-    border: 1.5px solid #d92d37;
-    background: #fffafa !important;
-    box-shadow: none !important;
-}
-
-.category-title {
-    font-size: 1.08rem;
-    font-weight: 700;
-    color: #1f2937 !important;
-    margin-bottom: 5px;
-    line-height: 1.2;
-}
-
-.category-subtitle {
-    font-size: 0.82rem;
-    color: #667085 !important;
-    line-height: 1.35;
-}
-
+/* ---------- Category Buttons ---------- */
 div[data-testid="stButton"] > button {
     width: 100%;
-    min-height: 42px;
-    border-radius: 11px;
-    border: 1.3px solid #d92d37;
+    min-height: 52px;
+    border-radius: 12px;
+    border: 1.4px solid #d92d37;
     background: #ffffff !important;
     color: #d92d37 !important;
-    font-size: 0.9rem;
-    font-weight: 650;
-    padding: 6px 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    box-shadow: none !important;
 }
 
 div[data-testid="stButton"] > button:hover {
     background: #fff4f4 !important;
     color: #b4232c !important;
-    border-color: #b4232c;
+    border-color: #b4232c !important;
+}
+
+div[data-testid="stButton"] > button:focus {
+    box-shadow: none !important;
+    outline: none !important;
 }
 
 /* ---------- Inputs ---------- */
@@ -175,13 +143,6 @@ div[data-testid="stTextInput"] label {
     font-size: 1.02rem !important;
     font-weight: 500 !important;
     color: #1f2937 !important;
-}
-
-div[data-testid="stSelectbox"] div,
-div[data-testid="stTextInput"] div {
-    font-size: 1.02rem !important;
-    color: #111827 !important;
-    font-weight: 400 !important;
 }
 
 div[data-baseweb="select"] > div,
@@ -197,7 +158,6 @@ div[data-baseweb="input"] > div {
 div[data-baseweb="select"] span {
     color: #111827 !important;
     font-weight: 400 !important;
-    background-color: transparent !important;
     -webkit-text-fill-color: #111827 !important;
 }
 
@@ -211,20 +171,7 @@ div[data-baseweb="input"] input {
 div[data-baseweb="input"] input::placeholder {
     color: #667085 !important;
     opacity: 1 !important;
-    font-weight: 400 !important;
     -webkit-text-fill-color: #667085 !important;
-}
-
-div[data-baseweb="popover"] {
-    background-color: #ffffff !important;
-    color: #111827 !important;
-}
-
-div[data-baseweb="popover"] * {
-    background-color: #ffffff !important;
-    color: #111827 !important;
-    -webkit-text-fill-color: #111827 !important;
-    font-weight: 400 !important;
 }
 
 ul[role="listbox"] {
@@ -237,60 +184,20 @@ ul[role="listbox"] {
 li[role="option"] {
     background-color: #ffffff !important;
     color: #111827 !important;
-    font-weight: 400 !important;
     -webkit-text-fill-color: #111827 !important;
-}
-
-li[role="option"] div,
-li[role="option"] span {
-    background-color: transparent !important;
-    color: #111827 !important;
-    -webkit-text-fill-color: #111827 !important;
-    font-weight: 400 !important;
-}
-
-li[role="option"]:hover {
-    background-color: #f8fafc !important;
-    color: #111827 !important;
-}
-
-li[role="option"]:hover * {
-    background-color: #f8fafc !important;
-    color: #111827 !important;
-    -webkit-text-fill-color: #111827 !important;
-}
-
-li[aria-selected="true"],
-li[aria-selected="true"] * {
-    background-color: #fff5f5 !important;
-    color: #111827 !important;
-    -webkit-text-fill-color: #111827 !important;
-    font-weight: 500 !important;
-}
-
-input, textarea, select, button {
-    color-scheme: light !important;
-    background-color: #ffffff !important;
-    color: #111827 !important;
 }
 
 /* ---------- Alerts ---------- */
 .stAlert {
-    border-radius: 7px;
-    border: 1px solid rgba(22, 163, 74, 0.12);
-}
-
-.stAlert div {
-    color: #166534 !important;
-    font-weight: 400 !important;
+    border-radius: 8px;
 }
 
 /* ---------- Metric Grid ---------- */
 .metric-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 18px;
-    margin: 18px 0 32px 0;
+    gap: 16px;
+    margin: 18px 0 28px 0;
 }
 
 .metric-grid.two-col {
@@ -300,54 +207,41 @@ input, textarea, select, button {
 .metric-card {
     background: #ffffff !important;
     border: 1px solid #eceff3;
-    border-radius: 7px;
-    padding: 20px 22px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.018);
-    min-height: 145px;
-    overflow: visible !important;
+    border-radius: 10px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.01);
+    min-height: 128px;
 }
 
 .metric-label {
-    font-size: 0.98rem !important;
+    font-size: 0.95rem !important;
     color: #667085 !important;
     font-weight: 500 !important;
-    margin-bottom: 18px;
+    margin-bottom: 14px;
 }
 
 .metric-value {
-    font-size: 1.75rem !important;
+    font-size: 1.55rem !important;
     font-weight: 600 !important;
     color: #1f2937 !important;
-    line-height: 1.35 !important;
-    white-space: normal !important;
-    overflow: visible !important;
-    text-overflow: unset !important;
+    line-height: 1.3 !important;
     word-break: break-word !important;
 }
 
 .location-card .metric-value {
-    font-size: 1.45rem !important;
+    font-size: 1.3rem !important;
 }
 
 /* ---------- Result Sections ---------- */
-.section-title {
-    font-size: 1.35rem;
-    font-weight: 600;
-    color: #1f2937 !important;
-    margin-top: 8px;
-    margin-bottom: 14px;
-}
-
 .selected-model {
     background: #ffffff !important;
     border: 1px solid #eceff3;
-    border-radius: 7px;
-    padding: 15px 18px;
-    margin: 18px 0 16px 0;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.015);
-    font-size: 1.02rem;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 16px 0 14px 0;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.01);
+    font-size: 1rem;
     color: #1f2937 !important;
-    font-weight: 400 !important;
 }
 
 .selected-model .label {
@@ -356,54 +250,35 @@ input, textarea, select, button {
     margin-right: 8px;
 }
 
-.selected-model .value {
-    color: #1f2937 !important;
-    font-weight: 400 !important;
-}
-
 .model-item {
     background: #ffffff !important;
     border: 1px solid #eceff3;
-    border-radius: 7px;
-    padding: 13px 15px;
-    margin-bottom: 9px;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.012);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.008);
     color: #1f2937 !important;
-    font-weight: 400 !important;
-    font-size: 1rem !important;
-    line-height: 1.45;
-}
-
-details {
-    background: #ffffff !important;
-    border-radius: 16px !important;
-    color: #111827 !important;
-    border: 1px solid #eceff3;
-}
-
-details * {
-    color: #111827 !important;
+    font-size: 0.98rem !important;
+    line-height: 1.42;
 }
 
 /* ---------- Mobile ---------- */
 @media screen and (max-width: 768px) {
     .block-container {
-        padding-top: 1.1rem;
-        padding-left: 0.85rem;
-        padding-right: 0.85rem;
+        padding-top: 1rem;
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
     }
 
     .app-card {
-        padding: 20px 18px;
-        border-radius: 7px;
+        padding: 18px 16px;
         margin-bottom: 16px;
-        box-shadow: 0 1px 5px rgba(0,0,0,0.015);
     }
 
     .utility-tag {
         font-size: 0.72rem;
         padding: 6px 10px;
-        margin-bottom: 14px;
+        margin-bottom: 12px;
     }
 
     .app-title {
@@ -412,109 +287,53 @@ details * {
     }
 
     .app-subtitle {
-        font-size: 0.95rem;
-        color: #475467 !important;
-        font-weight: 400;
+        font-size: 0.94rem;
         line-height: 1.45;
     }
 
-    .category-title-main {
-        font-size: 1.1rem;
-        margin-bottom: 8px;
-    }
-
-    .category-card {
-        min-height: 78px;
-        padding: 12px 10px;
-        border-radius: 11px;
-        margin-bottom: 7px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.012);
-    }
-
-    .category-title {
-        font-size: 0.98rem;
-        margin-bottom: 4px;
-    }
-
-    .category-subtitle {
-        font-size: 0.72rem;
-        line-height: 1.25;
+    .section-title {
+        font-size: 1.15rem;
+        margin-bottom: 10px;
     }
 
     div[data-testid="stButton"] > button {
-        min-height: 38px;
-        font-size: 0.78rem;
+        min-height: 44px;
+        font-size: 0.88rem;
         border-radius: 10px;
-        padding: 5px 6px;
-    }
-
-    div[data-testid="stSelectbox"] label,
-    div[data-testid="stTextInput"] label {
-        font-size: 1.04rem !important;
-        font-weight: 500 !important;
-    }
-
-    div[data-baseweb="select"] span,
-    div[data-baseweb="input"] input {
-        font-size: 1rem !important;
-        color: #111827 !important;
-        font-weight: 400 !important;
-        -webkit-text-fill-color: #111827 !important;
-    }
-
-    div[data-baseweb="input"] input::placeholder {
-        color: #667085 !important;
-        font-weight: 400 !important;
-        -webkit-text-fill-color: #667085 !important;
     }
 
     .metric-grid,
     .metric-grid.two-col {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-        margin: 16px 0 28px 0;
+        gap: 10px;
+        margin: 14px 0 24px 0;
     }
 
     .metric-card {
-        min-height: 112px;
-        padding: 15px 14px;
-        border-radius: 7px;
-        box-shadow: 0 1px 5px rgba(0,0,0,0.012);
+        min-height: 108px;
+        padding: 14px 14px;
     }
 
     .location-card {
         grid-column: 1 / -1;
-        min-height: auto;
     }
 
     .metric-label {
-        font-size: 0.86rem !important;
-        margin-bottom: 10px;
+        font-size: 0.84rem !important;
+        margin-bottom: 8px;
     }
 
     .metric-value {
-        font-size: 1.35rem !important;
-        line-height: 1.28 !important;
+        font-size: 1.22rem !important;
     }
 
     .location-card .metric-value {
-        font-size: 1.18rem !important;
-        line-height: 1.35 !important;
+        font-size: 1.08rem !important;
+        line-height: 1.3 !important;
     }
 
     .model-item {
-        font-size: 0.98rem !important;
-        font-weight: 400 !important;
-    }
-
-    .selected-model {
-        font-size: 1rem !important;
-        box-shadow: 0 1px 5px rgba(0,0,0,0.012);
-    }
-
-    .section-title {
-        font-size: 1.2rem;
-        font-weight: 600;
+        font-size: 0.94rem !important;
     }
 }
 </style>
@@ -533,14 +352,10 @@ st.markdown("""
 
 SHEET_URL = st.secrets.get("SHEET_URL", "")
 
-
-# ---------- Google Sheet Helpers ----------
+# ---------- Helpers ----------
 def get_sheet_id(url):
     match = re.search(r"/d/([a-zA-Z0-9-_]+)", url)
-    if match:
-        return match.group(1)
-    return None
-
+    return match.group(1) if match else None
 
 def excel_export_url(sheet_url):
     sheet_id = get_sheet_id(sheet_url)
@@ -548,10 +363,8 @@ def excel_export_url(sheet_url):
         return sheet_url
     return f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=xlsx"
 
-
 def clean_text(value):
     return str(value).strip() if value is not None else ""
-
 
 def make_compatible_df(raw_df, location_col_index=1, compatible_col_index=2):
     raw_df = raw_df.fillna("")
@@ -577,7 +390,6 @@ def make_compatible_df(raw_df, location_col_index=1, compatible_col_index=2):
 
     return compatible_df.drop_duplicates().reset_index(drop=True)
 
-
 def make_model_list(raw_df, model_col_index):
     raw_df = raw_df.fillna("")
 
@@ -585,14 +397,12 @@ def make_model_list(raw_df, model_col_index):
         return []
 
     models = raw_df.iloc[:, model_col_index].astype(str).str.strip()
-
     models = models[
         (models != "") &
         (~models.str.lower().str.contains("all modals|all models|nan", na=False))
     ]
 
     return sorted(models.drop_duplicates().tolist())
-
 
 def make_display_type_map(raw_df):
     raw_df = raw_df.fillna("")
@@ -616,7 +426,6 @@ def make_display_type_map(raw_df):
         for _, row in models_df.drop_duplicates(subset=["model"], keep="first").iterrows()
         if row["display_type"] and row["display_type"].lower() != "nan"
     }
-
 
 @st.cache_data(ttl=60)
 def load_data(sheet_url):
@@ -646,36 +455,24 @@ def load_data(sheet_url):
         engine="openpyxl"
     )
 
-    # Tempered:
-    # compatible modal sheet:
-    # Column B = location
-    # Column C = compatible model list
     tempered_df = make_compatible_df(
         compatible_raw,
         location_col_index=1,
         compatible_col_index=2
     )
 
-    # Mobile Cover:
-    # Mobile Cover sheet:
-    # Column B = location
-    # Column C = compatible back cover model list
     back_cover_df = make_compatible_df(
         mobile_cover_raw,
         location_col_index=1,
         compatible_col_index=2
     )
 
-    # All Modals sheet:
-    # Column C = tempered model list
-    # Column G = mobile cover model list
     tempered_model_list = make_model_list(models_raw, model_col_index=2)
     back_cover_model_list = make_model_list(models_raw, model_col_index=6)
 
     display_type_map = make_display_type_map(models_raw)
 
     return tempered_df, back_cover_df, tempered_model_list, back_cover_model_list, display_type_map
-
 
 def find_matches(df, search_model):
     search_model = clean_text(search_model)
@@ -691,7 +488,6 @@ def find_matches(df, search_model):
             regex=False
         )
     ]
-
 
 def render_search_section(
     section_title,
@@ -756,7 +552,7 @@ def render_search_section(
         f"""
 <div class="selected-model">
     <span class="label">Selected model:</span>
-    <span class="value">{safe_search_model}</span>
+    <span>{safe_search_model}</span>
 </div>
 """,
         unsafe_allow_html=True
@@ -764,7 +560,6 @@ def render_search_section(
 
     if show_display_type:
         display_type = "Not found"
-
         if display_type_map:
             display_type = display_type_map.get(search_model.lower(), "Not found")
 
@@ -817,7 +612,6 @@ def render_search_section(
     with st.expander("Matched Rows"):
         st.dataframe(result, use_container_width=True)
 
-
 # ---------- Load Data ----------
 if not SHEET_URL:
     st.error("SHEET_URL is missing. Please add your Google Sheet link in Streamlit secrets.")
@@ -836,50 +630,25 @@ except Exception as e:
     st.caption(str(e))
     st.stop()
 
-
-# ---------- Category Selector ----------
+# ---------- Category Buttons Only ----------
 if "selected_category" not in st.session_state:
     st.session_state.selected_category = ""
 
-st.markdown(
-    '<div class="category-title-main">Select Category</div>',
-    unsafe_allow_html=True
-)
+st.markdown('<div class="section-title">Select Category</div>', unsafe_allow_html=True)
 
-col_a, col_b = st.columns(2)
+btn_col1, btn_col2 = st.columns(2)
 
-with col_a:
-    active_class = "active" if st.session_state.selected_category == "tempered" else ""
-    st.markdown(f"""
-    <div class="category-card {active_class}">
-        <div class="category-title">Tempered Glass</div>
-        <div class="category-subtitle">
-            Tempered compatibility, location and display type.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    if st.button("Tempered Glass", key="open_tempered"):
+with btn_col1:
+    if st.button("Tempered Glass", key="open_tempered", use_container_width=True):
         st.session_state.selected_category = "tempered"
         st.rerun()
 
-with col_b:
-    active_class = "active" if st.session_state.selected_category == "mobile_cover" else ""
-    st.markdown(f"""
-    <div class="category-card {active_class}">
-        <div class="category-title">Mobile Cover</div>
-        <div class="category-subtitle">
-            Cover compatibility and location.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    if st.button("Mobile Cover", key="open_mobile_cover"):
+with btn_col2:
+    if st.button("Mobile Cover", key="open_mobile_cover", use_container_width=True):
         st.session_state.selected_category = "mobile_cover"
         st.rerun()
 
 st.markdown("<br>", unsafe_allow_html=True)
-
 
 # ---------- Conditional Search Section ----------
 if st.session_state.selected_category == "tempered":
