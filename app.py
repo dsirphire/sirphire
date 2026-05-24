@@ -12,34 +12,70 @@ st.markdown("""
 <style>
 .block-container {
     padding-top: 1.5rem;
+    max-width: 1100px;
 }
 .app-title {
-    font-size: 34px;
-    font-weight: 800;
+    font-size: 42px;
+    font-weight: 900;
     color: #111827;
+    line-height: 1.1;
 }
 .app-title span {
     color: #ef4444;
 }
 .sub-title {
     color: #6b7280;
-    font-size: 15px;
+    font-size: 17px;
+    margin-top: 8px;
 }
-.result-box {
+.search-box {
     background: #f9fafb;
     border: 1px solid #e5e7eb;
-    padding: 18px;
-    border-radius: 14px;
-    margin-top: 14px;
+    padding: 22px;
+    border-radius: 18px;
+    margin-top: 24px;
 }
-.badge {
+.card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    padding: 20px;
+    border-radius: 18px;
+    margin-top: 18px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+}
+.card-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 8px;
+}
+.found {
     display: inline-block;
-    padding: 5px 10px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: #dcfce7;
+    color: #166534;
+    font-weight: 800;
+    font-size: 13px;
+}
+.not-found {
+    display: inline-block;
+    padding: 5px 12px;
     border-radius: 999px;
     background: #fee2e2;
     color: #991b1b;
+    font-weight: 800;
     font-size: 13px;
-    font-weight: 700;
+}
+.location {
+    font-size: 28px;
+    font-weight: 900;
+    color: #ef4444;
+    margin: 12px 0;
+}
+.small-text {
+    color: #6b7280;
+    font-size: 14px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -50,13 +86,19 @@ PRODUCT_CONFIG = {
         "secret_key": "TEMPERED_SHEET_URL",
         "fallback_secret_key": "SHEET_URL",
         "type_label": "Display Type",
-        "search_placeholder": "Search model for tempered glass..."
+        "icon": "🛡️"
     },
     "Mobile Cover": {
         "secret_key": "COVER_SHEET_URL",
         "fallback_secret_key": None,
         "type_label": "Cover Type",
-        "search_placeholder": "Search model for mobile cover..."
+        "icon": "📱"
+    },
+    "Camera Lens Protector": {
+        "secret_key": "LENS_SHEET_URL",
+        "fallback_secret_key": None,
+        "type_label": "Lens Type",
+        "icon": "📷"
     }
 }
 
@@ -149,91 +191,113 @@ def get_model_type(search_text, all_models_df):
     return "Not found"
 
 
-st.markdown(
-    """
-    <div class="app-title">Sirphire <span>Inventory</span></div>
-    <div class="sub-title">Tempered Glass & Mobile Cover Compatibility Search</div>
-    """,
-    unsafe_allow_html=True
-)
+def get_all_model_options():
+    models = []
 
-st.divider()
+    for product_name, config in PRODUCT_CONFIG.items():
+        sheet_url = get_sheet_url(config)
 
-product = st.radio(
-    "Select Product",
-    ["Tempered Glass", "Mobile Cover"],
-    horizontal=True
-)
+        if not sheet_url:
+            continue
 
-config = PRODUCT_CONFIG[product]
-sheet_url = get_sheet_url(config)
+        try:
+            _, all_models_df = load_data(sheet_url)
+            models.extend(all_models_df["model"].dropna().tolist())
+        except Exception:
+            pass
 
-if not sheet_url:
-    st.warning(f"{product} sheet link not found. Please add it in Streamlit Secrets.")
-    st.stop()
+    clean_models = sorted(list(set([str(m).strip() for m in models if str(m).strip()])))
+    return clean_models
 
-try:
-    compatible_df, all_models_df = load_data(sheet_url)
-except Exception as e:
-    st.error("Sheet data load nahi ho pa raha. Sheet link, sharing permission, ya tab names check karo.")
-    st.exception(e)
-    st.stop()
 
-model_options = sorted(all_models_df["model"].dropna().unique().tolist())
+def render_product_result(product_name, config, search_text):
+    sheet_url = get_sheet_url(config)
 
-col1, col2 = st.columns([2, 1])
-
-with col1:
-    selected_model = st.selectbox(
-        "Select Model",
-        [""] + model_options
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="card-title">{config["icon"]} {product_name}</div>',
+        unsafe_allow_html=True
     )
 
-with col2:
-    manual_search = st.text_input(
-        "Manual Search",
-        placeholder=config["search_placeholder"]
-    )
+    if not sheet_url:
+        st.markdown('<span class="not-found">Sheet link missing</span>', unsafe_allow_html=True)
+        st.warning(f"{product_name} ka sheet link Streamlit Secrets me add nahi hai.")
+        st.markdown("</div>", unsafe_allow_html=True)
+        return
 
-search_text = manual_search.strip() if manual_search.strip() else selected_model.strip()
+    try:
+        compatible_df, all_models_df = load_data(sheet_url)
+    except Exception as e:
+        st.markdown('<span class="not-found">Sheet error</span>', unsafe_allow_html=True)
+        st.error(f"{product_name} sheet load nahi ho rahi. Tab name ya permission check karo.")
+        st.caption(str(e))
+        st.markdown("</div>", unsafe_allow_html=True)
+        return
 
-if search_text:
     matches = find_matches(search_text, compatible_df)
     model_type = get_model_type(search_text, all_models_df)
 
-    st.markdown(f'<span class="badge">{product}</span>', unsafe_allow_html=True)
-
     if matches.empty:
-        st.error("No compatible location found.")
-    else:
-        locations = matches["location"].dropna().unique().tolist()
-        compatible_count = len(matches)
+        st.markdown('<span class="not-found">Not Found</span>', unsafe_allow_html=True)
+        st.write("Is model ke liye location nahi mili.")
+        st.markdown("</div>", unsafe_allow_html=True)
+        return
 
-        st.markdown('<div class="result-box">', unsafe_allow_html=True)
+    locations = matches["location"].dropna().unique().tolist()
 
-        st.subheader(search_text)
+    st.markdown('<span class="found">Available</span>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="location">{", ".join(locations)}</div>',
+        unsafe_allow_html=True
+    )
 
-        c1, c2, c3 = st.columns(3)
+    c1, c2 = st.columns(2)
 
-        with c1:
-            st.metric("Location", ", ".join(locations))
+    with c1:
+        st.metric("Compatible Count", len(matches))
 
-        with c2:
-            st.metric("Compatible Count", compatible_count)
+    with c2:
+        st.metric(config["type_label"], model_type)
 
-        with c3:
-            st.metric(config["type_label"], model_type)
-
-        st.markdown("### Compatible Model List")
-
+    with st.expander("Compatible Model List"):
         for _, row in matches.iterrows():
             st.write(f"**Location:** {row['location']}")
             st.write(row["compatible"])
             st.divider()
 
-        st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-        with st.expander("Matched Rows"):
-            st.dataframe(matches, use_container_width=True)
+
+st.markdown(
+    """
+    <div class="app-title">Sirphire <span>Inventory</span></div>
+    <div class="sub-title">Ek model search karo aur tempered glass, mobile cover, camera lens protector ki location ek saath dekho.</div>
+    """,
+    unsafe_allow_html=True
+)
+
+model_options = get_all_model_options()
+
+st.markdown('<div class="search-box">', unsafe_allow_html=True)
+
+selected_model = st.selectbox(
+    "Model select karo",
+    [""] + model_options
+)
+
+manual_search = st.text_input(
+    "Ya model name manually type karo",
+    placeholder="Example: iPhone 13, Vivo Y20, Redmi Note 10..."
+)
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+search_text = manual_search.strip() if manual_search.strip() else selected_model.strip()
+
+if not search_text:
+    st.info("Model select karo ya search box me model name type karo.")
 else:
-    st.info("Model select karo ya manual search me model name type karo.")
+    st.subheader(f"Search Result: {search_text}")
+
+    for product_name, config in PRODUCT_CONFIG.items():
+        render_product_result(product_name, config, search_text)
