@@ -35,8 +35,7 @@ st.markdown("""
     margin-top: 10px;
     margin-bottom: 18px;
 }
-</style>
-""", unsafe_allow_html=True)
+
 .search-box {
     background: #f9fafb;
     border: 1px solid #e5e7eb;
@@ -44,6 +43,7 @@ st.markdown("""
     border-radius: 18px;
     margin-top: 24px;
 }
+
 .card {
     background: white;
     border: 1px solid #e5e7eb;
@@ -52,12 +52,14 @@ st.markdown("""
     margin-top: 18px;
     box-shadow: 0 4px 14px rgba(0,0,0,0.04);
 }
+
 .card-title {
     font-size: 22px;
     font-weight: 800;
     color: #111827;
     margin-bottom: 8px;
 }
+
 .found {
     display: inline-block;
     padding: 5px 12px;
@@ -67,6 +69,7 @@ st.markdown("""
     font-weight: 800;
     font-size: 13px;
 }
+
 .not-found {
     display: inline-block;
     padding: 5px 12px;
@@ -76,12 +79,14 @@ st.markdown("""
     font-weight: 800;
     font-size: 13px;
 }
+
 .location {
     font-size: 28px;
     font-weight: 900;
     color: #ef4444;
     margin: 12px 0;
 }
+
 .small-text {
     color: #6b7280;
     font-size: 14px;
@@ -123,6 +128,7 @@ def convert_to_xlsx_export_url(url):
     match = re.search(r"/d/([a-zA-Z0-9-_]+)", url)
     if not match:
         return None
+
     sheet_id = match.group(1)
     return f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=xlsx"
 
@@ -130,6 +136,7 @@ def convert_to_xlsx_export_url(url):
 @st.cache_data(ttl=300)
 def load_data(sheet_url):
     export_url = convert_to_xlsx_export_url(sheet_url)
+
     if not export_url:
         raise ValueError("Invalid Google Sheet URL")
 
@@ -164,7 +171,7 @@ def load_data(sheet_url):
 
 
 def find_matches(search_text, compatible_df):
-    search_text = search_text.strip().lower()
+    search_text = str(search_text).strip().lower()
 
     if not search_text:
         return pd.DataFrame()
@@ -178,7 +185,7 @@ def find_matches(search_text, compatible_df):
 
 
 def get_model_type(search_text, all_models_df):
-    search_text = search_text.strip().lower()
+    search_text = str(search_text).strip().lower()
 
     exact_match = all_models_df[
         all_models_df["model"].str.lower() == search_text
@@ -215,7 +222,10 @@ def get_all_model_options():
         except Exception:
             pass
 
-    clean_models = sorted(list(set([str(m).strip() for m in models if str(m).strip()])))
+    clean_models = sorted(
+        list(set([str(model).strip() for model in models if str(model).strip()]))
+    )
+
     return clean_models
 
 
@@ -223,13 +233,17 @@ def render_product_result(product_name, config, search_text):
     sheet_url = get_sheet_url(config)
 
     st.markdown('<div class="card">', unsafe_allow_html=True)
+
     st.markdown(
         f'<div class="card-title">{config["icon"]} {product_name}</div>',
         unsafe_allow_html=True
     )
 
     if not sheet_url:
-        st.markdown('<span class="not-found">Sheet link missing</span>', unsafe_allow_html=True)
+        st.markdown(
+            '<span class="not-found">Sheet link missing</span>',
+            unsafe_allow_html=True
+        )
         st.warning(f"{product_name} ka sheet link Streamlit Secrets me add nahi hai.")
         st.markdown("</div>", unsafe_allow_html=True)
         return
@@ -237,7 +251,10 @@ def render_product_result(product_name, config, search_text):
     try:
         compatible_df, all_models_df = load_data(sheet_url)
     except Exception as e:
-        st.markdown('<span class="not-found">Sheet error</span>', unsafe_allow_html=True)
+        st.markdown(
+            '<span class="not-found">Sheet error</span>',
+            unsafe_allow_html=True
+        )
         st.error(f"{product_name} sheet load nahi ho rahi. Tab name ya permission check karo.")
         st.caption(str(e))
         st.markdown("</div>", unsafe_allow_html=True)
@@ -247,14 +264,21 @@ def render_product_result(product_name, config, search_text):
     model_type = get_model_type(search_text, all_models_df)
 
     if matches.empty:
-        st.markdown('<span class="not-found">Not Found</span>', unsafe_allow_html=True)
+        st.markdown(
+            '<span class="not-found">Not Found</span>',
+            unsafe_allow_html=True
+        )
         st.write("Is model ke liye location nahi mili.")
         st.markdown("</div>", unsafe_allow_html=True)
         return
 
     locations = matches["location"].dropna().unique().tolist()
 
-    st.markdown('<span class="found">Available</span>', unsafe_allow_html=True)
+    st.markdown(
+        '<span class="found">Available</span>',
+        unsafe_allow_html=True
+    )
+
     st.markdown(
         f'<div class="location">{", ".join(locations)}</div>',
         unsafe_allow_html=True
@@ -279,6 +303,7 @@ def render_product_result(product_name, config, search_text):
 
 st.markdown(
     """
+    <div style="height: 10px;"></div>
     <div class="app-title">Sirphire <span>Inventory</span></div>
     <div class="sub-title">Ek model search karo aur tempered glass, mobile cover, camera lens protector ki location ek saath dekho.</div>
     """,
