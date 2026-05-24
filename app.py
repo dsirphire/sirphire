@@ -360,6 +360,30 @@ li[role="option"] {
         font-size: 0.94rem !important;
     }
 }
+/* ---------- Force selectbox dropdown to open downward ---------- */
+div[data-baseweb="popover"] {
+    transform: none !important;
+    top: auto !important;
+    bottom: auto !important;
+}
+
+div[data-baseweb="popover"] > div {
+    transform: translateY(6px) !important;
+}
+
+/* Dropdown list height so it scrolls inside instead of going upward */
+ul[role="listbox"] {
+    max-height: 280px !important;
+    overflow-y: auto !important;
+}
+
+/* Mobile dropdown height */
+@media screen and (max-width: 768px) {
+    ul[role="listbox"] {
+        max-height: 230px !important;
+        overflow-y: auto !important;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
