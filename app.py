@@ -523,7 +523,6 @@ def render_search_section(
     search_model = manual_search.strip() if manual_search.strip() else selected_model.strip()
 
     if not search_model:
-        st.info("Select a model from the dropdown or type it manually.")
         return
 
     result = find_matches(df, search_model)
@@ -635,6 +634,28 @@ if "selected_category" not in st.session_state:
     st.session_state.selected_category = ""
 
 st.markdown('<div class="section-title">Select Category</div>', unsafe_allow_html=True)
+
+selected_category = st.session_state.selected_category
+
+st.markdown(f"""
+<style>
+button[kind="secondary"] {{
+    box-shadow: none !important;
+}}
+
+div[data-testid="column"]:nth-of-type(1) button {{
+    background: {"#d92d37" if selected_category == "tempered" else "#ffffff"} !important;
+    color: {"#ffffff" if selected_category == "tempered" else "#d92d37"} !important;
+    border-color: #d92d37 !important;
+}}
+
+div[data-testid="column"]:nth-of-type(2) button {{
+    background: {"#d92d37" if selected_category == "mobile_cover" else "#ffffff"} !important;
+    color: {"#ffffff" if selected_category == "mobile_cover" else "#d92d37"} !important;
+    border-color: #d92d37 !important;
+}}
+</style>
+""", unsafe_allow_html=True)
 
 btn_col1, btn_col2 = st.columns(2)
 
