@@ -4,7 +4,7 @@ import re
 import html
 
 st.set_page_config(
-    page_title="TC Dash",
+    page_title="Sirphire Utility",
     page_icon="",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -109,6 +109,60 @@ p, li, span, div, label {
     margin-bottom: 0;
     font-weight: 400;
     max-width: 760px;
+}
+
+/* ---------- Category Cards ---------- */
+.category-title-main {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #1f2937 !important;
+    margin-top: 8px;
+    margin-bottom: 14px;
+}
+
+.category-card {
+    background: #ffffff !important;
+    border: 1px solid #eceff3;
+    border-radius: 12px;
+    padding: 24px 22px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.035);
+    min-height: 130px;
+    margin-bottom: 12px;
+}
+
+.category-card.active {
+    border: 2px solid #d92d37;
+    background: #fff8f8 !important;
+}
+
+.category-title {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #1f2937 !important;
+    margin-bottom: 8px;
+}
+
+.category-subtitle {
+    font-size: 0.98rem;
+    color: #667085 !important;
+    line-height: 1.45;
+}
+
+div[data-testid="stButton"] > button {
+    width: 100%;
+    min-height: 58px;
+    border-radius: 14px;
+    border: 1.5px solid #d92d37;
+    background: #ffffff !important;
+    color: #d92d37 !important;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+div[data-testid="stButton"] > button:hover {
+    background: #fff4f4 !important;
+    color: #b4232c !important;
+    border-color: #b4232c;
 }
 
 /* ---------- Inputs ---------- */
@@ -235,6 +289,10 @@ input, textarea, select, button {
     margin: 18px 0 32px 0;
 }
 
+.metric-grid.two-col {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .metric-card {
     background: #ffffff !important;
     border: 1px solid #eceff3;
@@ -343,7 +401,7 @@ details * {
     }
 
     .app-title {
-        font-size: 2.45rem;
+        font-size: 2.25rem;
         line-height: 1.12;
     }
 
@@ -351,6 +409,15 @@ details * {
         font-size: 1.04rem;
         color: #475467 !important;
         font-weight: 400;
+    }
+
+    .category-card {
+        min-height: auto;
+        padding: 18px 16px;
+    }
+
+    .category-title {
+        font-size: 1.25rem;
     }
 
     div[data-testid="stSelectbox"] label,
@@ -373,7 +440,8 @@ details * {
         -webkit-text-fill-color: #667085 !important;
     }
 
-    .metric-grid {
+    .metric-grid,
+    .metric-grid.two-col {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
         margin: 16px 0 28px 0;
@@ -426,9 +494,9 @@ details * {
 st.markdown("""
 <div class="app-card">
     <div class="utility-tag">SIRPHIRE UTILITY</div>
-    <div class="app-title">Tempered &amp; <span>Back Cover</span> Dashboard</div>
+    <div class="app-title">Compatibility <span>Dashboard</span></div>
     <p class="app-subtitle">
-        Search a tempered glass or back cover model and instantly view its location and compatible model list.
+        Select Tempered Glass or Mobile Cover and instantly view location and compatible model list.
     </p>
 </div>
 """, unsafe_allow_html=True)
@@ -457,6 +525,7 @@ def clean_text(value):
 
 def make_compatible_df(raw_df, location_col_index=1, compatible_col_index=2):
     raw_df = raw_df.fillna("")
+
     compatible_df = raw_df.iloc[:, [location_col_index, compatible_col_index]].copy()
     compatible_df.columns = ["location", "compatible"]
 
@@ -481,16 +550,26 @@ def make_compatible_df(raw_df, location_col_index=1, compatible_col_index=2):
 
 def make_model_list(raw_df, model_col_index):
     raw_df = raw_df.fillna("")
+
+    if raw_df.shape[1] <= model_col_index:
+        return []
+
     models = raw_df.iloc[:, model_col_index].astype(str).str.strip()
+
     models = models[
         (models != "") &
         (~models.str.lower().str.contains("all modals|all models|nan", na=False))
     ]
+
     return sorted(models.drop_duplicates().tolist())
 
 
 def make_display_type_map(raw_df):
     raw_df = raw_df.fillna("")
+
+    if raw_df.shape[1] < 4:
+        return {}
+
     models_df = raw_df.iloc[:, [2, 3]].copy()
     models_df.columns = ["model", "display_type"]
 
@@ -537,16 +616,20 @@ def load_data(sheet_url):
         engine="openpyxl"
     )
 
-    # Tempered: compatible modal sheet
-    # Column B = location, Column C = compatible tempered model list
+    # Tempered:
+    # compatible modal sheet:
+    # Column B = location
+    # Column C = compatible model list
     tempered_df = make_compatible_df(
         compatible_raw,
         location_col_index=1,
         compatible_col_index=2
     )
 
-    # Back Cover: Mobile Cover sheet
-    # Column B = location, Column C = compatible back cover model list
+    # Mobile Cover:
+    # Mobile Cover sheet:
+    # Column B = location
+    # Column C = compatible back cover model list
     back_cover_df = make_compatible_df(
         mobile_cover_raw,
         location_col_index=1,
@@ -554,8 +637,8 @@ def load_data(sheet_url):
     )
 
     # All Modals sheet:
-    # Column C = tempered model names
-    # Column G = back cover model names
+    # Column C = tempered model list
+    # Column G = mobile cover model list
     tempered_model_list = make_model_list(models_raw, model_col_index=2)
     back_cover_model_list = make_model_list(models_raw, model_col_index=6)
 
@@ -675,7 +758,7 @@ def render_search_section(
 """
     else:
         metric_html = f"""
-<div class="metric-grid">
+<div class="metric-grid two-col">
     <div class="metric-card location-card">
         <div class="metric-label">Location</div>
         <div class="metric-value">{safe_location_text}</div>
@@ -724,25 +807,71 @@ except Exception as e:
     st.stop()
 
 
-# ---------- Tempered Search ----------
-render_search_section(
-    section_title="Tempered Compatibility",
-    df=tempered_df,
-    model_list=tempered_model_list,
-    placeholder="Example: Redmi Note 7 Tempered",
-    result_key="tempered",
-    show_display_type=True,
-    display_type_map=display_type_map
+# ---------- Category Selector ----------
+if "selected_category" not in st.session_state:
+    st.session_state.selected_category = ""
+
+st.markdown(
+    '<div class="category-title-main">Select Category</div>',
+    unsafe_allow_html=True
 )
 
-st.markdown("<br><hr><br>", unsafe_allow_html=True)
+col_a, col_b = st.columns(2)
 
-# ---------- Back Cover Search ----------
-render_search_section(
-    section_title="Back Cover Compatibility",
-    df=back_cover_df,
-    model_list=back_cover_model_list,
-    placeholder="Example: Redmi Note 7 Back Cover",
-    result_key="back_cover",
-    show_display_type=False
-)
+with col_a:
+    active_class = "active" if st.session_state.selected_category == "tempered" else ""
+    st.markdown(f"""
+    <div class="category-card {active_class}">
+        <div class="category-title">Tempered Glass</div>
+        <div class="category-subtitle">
+            Search tempered glass compatibility, location and display type.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if st.button("Open Tempered Glass", key="open_tempered"):
+        st.session_state.selected_category = "tempered"
+        st.rerun()
+
+with col_b:
+    active_class = "active" if st.session_state.selected_category == "mobile_cover" else ""
+    st.markdown(f"""
+    <div class="category-card {active_class}">
+        <div class="category-title">Mobile Cover</div>
+        <div class="category-subtitle">
+            Search mobile/back cover compatibility and location.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if st.button("Open Mobile Cover", key="open_mobile_cover"):
+        st.session_state.selected_category = "mobile_cover"
+        st.rerun()
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+
+# ---------- Conditional Search Section ----------
+if st.session_state.selected_category == "tempered":
+    render_search_section(
+        section_title="Tempered Glass Compatibility",
+        df=tempered_df,
+        model_list=tempered_model_list,
+        placeholder="Example: Redmi Note 7 Tempered",
+        result_key="tempered",
+        show_display_type=True,
+        display_type_map=display_type_map
+    )
+
+elif st.session_state.selected_category == "mobile_cover":
+    render_search_section(
+        section_title="Mobile Cover Compatibility",
+        df=back_cover_df,
+        model_list=back_cover_model_list,
+        placeholder="Example: Redmi Note 7 Back Cover",
+        result_key="back_cover",
+        show_display_type=False
+    )
+
+else:
+    st.info("Please select Tempered Glass or Mobile Cover to start searching.")
