@@ -419,6 +419,48 @@ li[role="option"] {
         font-size: 0.94rem !important;
     }
 }
+/* ---------- Selectbox No Results White Fix ---------- */
+div[data-baseweb="popover"] {
+    background: #ffffff !important;
+    color: #111827 !important;
+}
+
+div[data-baseweb="popover"] > div {
+    background: #ffffff !important;
+    color: #111827 !important;
+    border: 1px solid #d1d5db !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+}
+
+div[data-baseweb="popover"] * {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    opacity: 1 !important;
+}
+
+/* No results box */
+div[data-baseweb="menu"],
+div[role="listbox"],
+ul[role="listbox"] {
+    background: #ffffff !important;
+    color: #111827 !important;
+}
+
+div[data-baseweb="menu"] *,
+div[role="listbox"] *,
+ul[role="listbox"] * {
+    background: #ffffff !important;
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    opacity: 1 !important;
+}
+
+/* No results text */
+div[data-baseweb="popover"] div {
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
