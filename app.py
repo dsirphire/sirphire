@@ -54,13 +54,14 @@ p, li, span, div, label {
     color: #111827 !important;
 }
 
+/* ---------- Header ---------- */
 .app-card {
     background: linear-gradient(180deg, #ffffff 0%, #fffdfd 100%) !important;
     border: 1px solid #f0dede;
     border-radius: 7px;
     padding: 30px 32px;
-    box-shadow: 0 4px 14px rgba(25, 25, 25, 0.025);
-    margin-bottom: 26px;
+    box-shadow: 0 2px 8px rgba(25, 25, 25, 0.018);
+    margin-bottom: 24px;
     position: relative;
     overflow: hidden;
 }
@@ -71,7 +72,7 @@ p, li, span, div, label {
     top: 0;
     left: 0;
     width: 100%;
-    height: 6px;
+    height: 5px;
     background: linear-gradient(90deg, #ff4b4b 0%, #ff7a7a 100%);
 }
 
@@ -111,52 +112,55 @@ p, li, span, div, label {
     max-width: 760px;
 }
 
-/* ---------- Category Cards ---------- */
+/* ---------- Category Cards Compact ---------- */
 .category-title-main {
-    font-size: 1.35rem;
+    font-size: 1.25rem;
     font-weight: 600;
     color: #1f2937 !important;
-    margin-top: 8px;
-    margin-bottom: 14px;
+    margin-top: 6px;
+    margin-bottom: 10px;
 }
 
 .category-card {
     background: #ffffff !important;
     border: 1px solid #eceff3;
     border-radius: 12px;
-    padding: 24px 22px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.035);
-    min-height: 130px;
-    margin-bottom: 12px;
-}
-
-.category-card.active {
-    border: 2px solid #d92d37;
-    background: #fff8f8 !important;
-}
-
-.category-title {
-    font-size: 1.45rem;
-    font-weight: 700;
-    color: #1f2937 !important;
+    padding: 14px 14px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.015);
+    min-height: 88px;
     margin-bottom: 8px;
 }
 
+.category-card.active {
+    border: 1.5px solid #d92d37;
+    background: #fffafa !important;
+    box-shadow: none !important;
+}
+
+.category-title {
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: #1f2937 !important;
+    margin-bottom: 5px;
+    line-height: 1.2;
+}
+
 .category-subtitle {
-    font-size: 0.98rem;
+    font-size: 0.82rem;
     color: #667085 !important;
-    line-height: 1.45;
+    line-height: 1.35;
 }
 
 div[data-testid="stButton"] > button {
     width: 100%;
-    min-height: 58px;
-    border-radius: 14px;
-    border: 1.5px solid #d92d37;
+    min-height: 42px;
+    border-radius: 11px;
+    border: 1.3px solid #d92d37;
     background: #ffffff !important;
     color: #d92d37 !important;
-    font-size: 1.05rem;
-    font-weight: 700;
+    font-size: 0.9rem;
+    font-weight: 650;
+    padding: 6px 8px;
 }
 
 div[data-testid="stButton"] > button:hover {
@@ -298,7 +302,7 @@ input, textarea, select, button {
     border: 1px solid #eceff3;
     border-radius: 7px;
     padding: 20px 22px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.025);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.018);
     min-height: 145px;
     overflow: visible !important;
 }
@@ -340,7 +344,7 @@ input, textarea, select, button {
     border-radius: 7px;
     padding: 15px 18px;
     margin: 18px 0 16px 0;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.02);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.015);
     font-size: 1.02rem;
     color: #1f2937 !important;
     font-weight: 400 !important;
@@ -363,7 +367,7 @@ input, textarea, select, button {
     border-radius: 7px;
     padding: 13px 15px;
     margin-bottom: 9px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.018);
+    box-shadow: 0 1px 5px rgba(0,0,0,0.012);
     color: #1f2937 !important;
     font-weight: 400 !important;
     font-size: 1rem !important;
@@ -385,39 +389,63 @@ details * {
 @media screen and (max-width: 768px) {
     .block-container {
         padding-top: 1.1rem;
-        padding-left: 0.95rem;
-        padding-right: 0.95rem;
+        padding-left: 0.85rem;
+        padding-right: 0.85rem;
     }
 
     .app-card {
-        padding: 22px 20px;
+        padding: 20px 18px;
         border-radius: 7px;
-        margin-bottom: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.015);
     }
 
     .utility-tag {
-        font-size: 0.74rem;
-        padding: 7px 11px;
+        font-size: 0.72rem;
+        padding: 6px 10px;
+        margin-bottom: 14px;
     }
 
     .app-title {
-        font-size: 2.25rem;
+        font-size: 2rem;
         line-height: 1.12;
     }
 
     .app-subtitle {
-        font-size: 1.04rem;
+        font-size: 0.95rem;
         color: #475467 !important;
         font-weight: 400;
+        line-height: 1.45;
+    }
+
+    .category-title-main {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
     }
 
     .category-card {
-        min-height: auto;
-        padding: 18px 16px;
+        min-height: 78px;
+        padding: 12px 10px;
+        border-radius: 11px;
+        margin-bottom: 7px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.012);
     }
 
     .category-title {
-        font-size: 1.25rem;
+        font-size: 0.98rem;
+        margin-bottom: 4px;
+    }
+
+    .category-subtitle {
+        font-size: 0.72rem;
+        line-height: 1.25;
+    }
+
+    div[data-testid="stButton"] > button {
+        min-height: 38px;
+        font-size: 0.78rem;
+        border-radius: 10px;
+        padding: 5px 6px;
     }
 
     div[data-testid="stSelectbox"] label,
@@ -448,9 +476,10 @@ details * {
     }
 
     .metric-card {
-        min-height: 118px;
-        padding: 16px 15px;
+        min-height: 112px;
+        padding: 15px 14px;
         border-radius: 7px;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.012);
     }
 
     .location-card {
@@ -480,6 +509,7 @@ details * {
 
     .selected-model {
         font-size: 1rem !important;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.012);
     }
 
     .section-title {
@@ -824,12 +854,12 @@ with col_a:
     <div class="category-card {active_class}">
         <div class="category-title">Tempered Glass</div>
         <div class="category-subtitle">
-            Search tempered glass compatibility, location and display type.
+            Tempered compatibility, location and display type.
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    if st.button("Open Tempered Glass", key="open_tempered"):
+    if st.button("Tempered Glass", key="open_tempered"):
         st.session_state.selected_category = "tempered"
         st.rerun()
 
@@ -839,12 +869,12 @@ with col_b:
     <div class="category-card {active_class}">
         <div class="category-title">Mobile Cover</div>
         <div class="category-subtitle">
-            Search mobile/back cover compatibility and location.
+            Cover compatibility and location.
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    if st.button("Open Mobile Cover", key="open_mobile_cover"):
+    if st.button("Mobile Cover", key="open_mobile_cover"):
         st.session_state.selected_category = "mobile_cover"
         st.rerun()
 
