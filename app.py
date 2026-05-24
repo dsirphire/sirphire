@@ -184,6 +184,7 @@ div[data-baseweb="select"] span {
     font-weight: 400 !important;
     -webkit-text-fill-color: #111827 !important;
 }
+
 /* ---------- Selectbox search text visibility fix ---------- */
 div[data-baseweb="select"] input {
     color: #111827 !important;
@@ -234,7 +235,7 @@ li[role="option"] {
 
 li[role="option"]:hover,
 li[aria-selected="true"] {
-    background: #fff4f4 !important;
+    background: #f4f6f8 !important;
     color: #111827 !important;
 }
 
@@ -419,6 +420,7 @@ li[role="option"] {
         font-size: 0.94rem !important;
     }
 }
+
 /* ---------- Selectbox No Results White Fix ---------- */
 div[data-baseweb="popover"] {
     background: #ffffff !important;
@@ -460,6 +462,81 @@ ul[role="listbox"] * {
 div[data-baseweb="popover"] div {
     color: #111827 !important;
     -webkit-text-fill-color: #111827 !important;
+}
+
+/* ---------- FINAL Selectbox Clean Dropdown Fix ----------
+   Pink/red patching remove. Hover/focus only clean light grey.
+   Keep this block at the END of CSS.
+*/
+div[data-baseweb="popover"] {
+    background: transparent !important;
+    z-index: 999999 !important;
+}
+
+div[data-baseweb="popover"] > div,
+div[data-baseweb="menu"],
+div[role="listbox"],
+ul[role="listbox"] {
+    background: #ffffff !important;
+    color: #111827 !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 14px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+    overflow: hidden !important;
+}
+
+div[data-baseweb="popover"] [role="option"],
+div[data-baseweb="popover"] li[role="option"] {
+    background: #ffffff !important;
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    opacity: 1 !important;
+}
+
+div[data-baseweb="popover"] [role="option"] *,
+div[data-baseweb="popover"] li[role="option"] * {
+    background: transparent !important;
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    opacity: 1 !important;
+}
+
+/* Cursor/hover par sirf ye halka grey effect aayega */
+div[data-baseweb="popover"] [role="option"]:hover,
+div[data-baseweb="popover"] li[role="option"]:hover,
+div[data-baseweb="popover"] [role="option"][aria-selected="true"],
+div[data-baseweb="popover"] li[role="option"][aria-selected="true"],
+div[data-baseweb="popover"] [data-highlighted="true"] {
+    background: #f4f6f8 !important;
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+}
+
+div[data-baseweb="popover"] [role="option"]:hover *,
+div[data-baseweb="popover"] li[role="option"]:hover *,
+div[data-baseweb="popover"] [role="option"][aria-selected="true"] *,
+div[data-baseweb="popover"] li[role="option"][aria-selected="true"] *,
+div[data-baseweb="popover"] [data-highlighted="true"] * {
+    background: transparent !important;
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+}
+
+/* Input ke andar search text clean visible rahe */
+div[data-baseweb="select"] input,
+div[data-baseweb="select"] textarea {
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    caret-color: #111827 !important;
+    background: transparent !important;
+}
+
+/* Manual input focus par red patch nahi, clean border */
+div[data-baseweb="input"] > div:focus-within,
+div[data-baseweb="select"] > div:focus-within {
+    border-color: #cfd6e3 !important;
+    box-shadow: 0 0 0 1px #cfd6e3 !important;
+    outline: none !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -648,6 +725,7 @@ def render_search_section(
     search_model = manual_search.strip() if manual_search.strip() else selected_model.strip()
 
     if not search_model:
+        st.info("Select a model from the dropdown or type it manually.")
         return
 
     result = find_matches(df, search_model)
