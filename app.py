@@ -1,337 +1,748 @@
-import re
-import pandas as pd
 import streamlit as st
+import pandas as pd
+import re
+import html
 
 st.set_page_config(
-    page_title="Sirphire Inventory",
-    page_icon="📦",
-    layout="wide"
+    page_title="TC Dash",
+    page_icon="",
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
+# ---------- Force Light Modern UI CSS ----------
 st.markdown("""
 <style>
+:root {
+    color-scheme: light !important;
+}
+
+html, body, [data-testid="stAppViewContainer"], .stApp {
+    background: linear-gradient(135deg, #fcf7f7 0%, #ffffff 48%, #f7f8fb 100%) !important;
+    color: #111827 !important;
+    color-scheme: light !important;
+}
+
+* {
+    color-scheme: light !important;
+}
+
 .block-container {
-    padding-top: 3rem;
-    max-width: 1100px;
+    padding-top: 1.8rem;
+    padding-bottom: 2rem;
+    max-width: 1080px;
 }
 
-.app-title {
-    font-size: 42px;
-    font-weight: 900;
-    color: #111827;
-    line-height: 1.3;
-    padding-top: 8px;
-    margin-top: 10px;
-    overflow: visible;
+#MainMenu {
+    visibility: hidden;
 }
 
-.app-title span {
-    color: #ef4444;
+footer {
+    visibility: hidden;
 }
 
-.sub-title {
-    color: #6b7280;
-    font-size: 17px;
-    margin-top: 10px;
+header {
+    visibility: hidden;
+}
+
+.stToolbar {
+    display: none !important;
+}
+
+html, body, .stApp,
+p, li, span, div, label {
+    color: #111827 !important;
+}
+
+.app-card {
+    background: linear-gradient(180deg, #ffffff 0%, #fffdfd 100%) !important;
+    border: 1px solid #f0dede;
+    border-radius: 7px;
+    padding: 30px 32px;
+    box-shadow: 0 4px 14px rgba(25, 25, 25, 0.025);
+    margin-bottom: 26px;
+    position: relative;
+    overflow: hidden;
+}
+
+.app-card:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, #ff4b4b 0%, #ff7a7a 100%);
+}
+
+.utility-tag {
+    display: inline-block;
+    background: #fff4f4 !important;
+    color: #d92d37 !important;
+    border: 1px solid #ffd8d8;
+    padding: 8px 14px;
+    border-radius: 7px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
     margin-bottom: 18px;
 }
 
-.search-box {
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    padding: 22px;
-    border-radius: 18px;
-    margin-top: 24px;
+.app-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #1f2937 !important;
+    margin-bottom: 10px;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
 }
 
-.card {
-    background: white;
-    border: 1px solid #e5e7eb;
-    padding: 20px;
-    border-radius: 18px;
-    margin-top: 18px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+.app-title span {
+    color: #d92d37 !important;
+    font-weight: 700;
 }
 
-.card-title {
-    font-size: 22px;
-    font-weight: 800;
-    color: #111827;
-    margin-bottom: 8px;
+.app-subtitle {
+    font-size: 1.12rem;
+    color: #4b5563 !important;
+    line-height: 1.65;
+    margin-bottom: 0;
+    font-weight: 400;
+    max-width: 760px;
 }
 
-.found {
-    display: inline-block;
-    padding: 5px 12px;
-    border-radius: 999px;
-    background: #dcfce7;
-    color: #166534;
-    font-weight: 800;
-    font-size: 13px;
+/* ---------- Inputs ---------- */
+div[data-testid="stSelectbox"] label,
+div[data-testid="stTextInput"] label {
+    font-size: 1.02rem !important;
+    font-weight: 500 !important;
+    color: #1f2937 !important;
 }
 
-.not-found {
-    display: inline-block;
-    padding: 5px 12px;
-    border-radius: 999px;
-    background: #fee2e2;
-    color: #991b1b;
-    font-weight: 800;
-    font-size: 13px;
+div[data-testid="stSelectbox"] div,
+div[data-testid="stTextInput"] div {
+    font-size: 1.02rem !important;
+    color: #111827 !important;
+    font-weight: 400 !important;
 }
 
-.location {
-    font-size: 28px;
-    font-weight: 900;
-    color: #ef4444;
-    margin: 12px 0;
+div[data-baseweb="select"] > div,
+div[data-baseweb="input"] > div {
+    border-radius: 16px !important;
+    background-color: #ffffff !important;
+    border: 1.5px solid #d6dbe4 !important;
+    color: #111827 !important;
+    min-height: 54px !important;
+    box-shadow: none !important;
 }
 
-.small-text {
-    color: #6b7280;
-    font-size: 14px;
+div[data-baseweb="select"] span {
+    color: #111827 !important;
+    font-weight: 400 !important;
+    background-color: transparent !important;
+    -webkit-text-fill-color: #111827 !important;
+}
+
+div[data-baseweb="input"] input {
+    color: #111827 !important;
+    background-color: #ffffff !important;
+    font-weight: 400 !important;
+    -webkit-text-fill-color: #111827 !important;
+}
+
+div[data-baseweb="input"] input::placeholder {
+    color: #667085 !important;
+    opacity: 1 !important;
+    font-weight: 400 !important;
+    -webkit-text-fill-color: #667085 !important;
+}
+
+div[data-baseweb="popover"] {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+}
+
+div[data-baseweb="popover"] * {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    font-weight: 400 !important;
+}
+
+ul[role="listbox"] {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 14px !important;
+}
+
+li[role="option"] {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+    font-weight: 400 !important;
+    -webkit-text-fill-color: #111827 !important;
+}
+
+li[role="option"] div,
+li[role="option"] span {
+    background-color: transparent !important;
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    font-weight: 400 !important;
+}
+
+li[role="option"]:hover {
+    background-color: #f8fafc !important;
+    color: #111827 !important;
+}
+
+li[role="option"]:hover * {
+    background-color: #f8fafc !important;
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+}
+
+li[aria-selected="true"],
+li[aria-selected="true"] * {
+    background-color: #fff5f5 !important;
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    font-weight: 500 !important;
+}
+
+input, textarea, select, button {
+    color-scheme: light !important;
+    background-color: #ffffff !important;
+    color: #111827 !important;
+}
+
+/* ---------- Alerts ---------- */
+.stAlert {
+    border-radius: 7px;
+    border: 1px solid rgba(22, 163, 74, 0.12);
+}
+
+.stAlert div {
+    color: #166534 !important;
+    font-weight: 400 !important;
+}
+
+/* ---------- Metric Grid ---------- */
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin: 18px 0 32px 0;
+}
+
+.metric-card {
+    background: #ffffff !important;
+    border: 1px solid #eceff3;
+    border-radius: 7px;
+    padding: 20px 22px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.025);
+    min-height: 145px;
+    overflow: visible !important;
+}
+
+.metric-label {
+    font-size: 0.98rem !important;
+    color: #667085 !important;
+    font-weight: 500 !important;
+    margin-bottom: 18px;
+}
+
+.metric-value {
+    font-size: 1.75rem !important;
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+    line-height: 1.35 !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    word-break: break-word !important;
+}
+
+.location-card .metric-value {
+    font-size: 1.45rem !important;
+}
+
+/* ---------- Result Sections ---------- */
+.section-title {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #1f2937 !important;
+    margin-top: 8px;
+    margin-bottom: 14px;
+}
+
+.selected-model {
+    background: #ffffff !important;
+    border: 1px solid #eceff3;
+    border-radius: 7px;
+    padding: 15px 18px;
+    margin: 18px 0 16px 0;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.02);
+    font-size: 1.02rem;
+    color: #1f2937 !important;
+    font-weight: 400 !important;
+}
+
+.selected-model .label {
+    color: #667085 !important;
+    font-weight: 500 !important;
+    margin-right: 8px;
+}
+
+.selected-model .value {
+    color: #1f2937 !important;
+    font-weight: 400 !important;
+}
+
+.model-item {
+    background: #ffffff !important;
+    border: 1px solid #eceff3;
+    border-radius: 7px;
+    padding: 13px 15px;
+    margin-bottom: 9px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.018);
+    color: #1f2937 !important;
+    font-weight: 400 !important;
+    font-size: 1rem !important;
+    line-height: 1.45;
+}
+
+details {
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    color: #111827 !important;
+    border: 1px solid #eceff3;
+}
+
+details * {
+    color: #111827 !important;
+}
+
+/* ---------- Mobile ---------- */
+@media screen and (max-width: 768px) {
+    .block-container {
+        padding-top: 1.1rem;
+        padding-left: 0.95rem;
+        padding-right: 0.95rem;
+    }
+
+    .app-card {
+        padding: 22px 20px;
+        border-radius: 7px;
+        margin-bottom: 20px;
+    }
+
+    .utility-tag {
+        font-size: 0.74rem;
+        padding: 7px 11px;
+    }
+
+    .app-title {
+        font-size: 2.45rem;
+        line-height: 1.12;
+    }
+
+    .app-subtitle {
+        font-size: 1.04rem;
+        color: #475467 !important;
+        font-weight: 400;
+    }
+
+    div[data-testid="stSelectbox"] label,
+    div[data-testid="stTextInput"] label {
+        font-size: 1.04rem !important;
+        font-weight: 500 !important;
+    }
+
+    div[data-baseweb="select"] span,
+    div[data-baseweb="input"] input {
+        font-size: 1rem !important;
+        color: #111827 !important;
+        font-weight: 400 !important;
+        -webkit-text-fill-color: #111827 !important;
+    }
+
+    div[data-baseweb="input"] input::placeholder {
+        color: #667085 !important;
+        font-weight: 400 !important;
+        -webkit-text-fill-color: #667085 !important;
+    }
+
+    .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin: 16px 0 28px 0;
+    }
+
+    .metric-card {
+        min-height: 118px;
+        padding: 16px 15px;
+        border-radius: 7px;
+    }
+
+    .location-card {
+        grid-column: 1 / -1;
+        min-height: auto;
+    }
+
+    .metric-label {
+        font-size: 0.86rem !important;
+        margin-bottom: 10px;
+    }
+
+    .metric-value {
+        font-size: 1.35rem !important;
+        line-height: 1.28 !important;
+    }
+
+    .location-card .metric-value {
+        font-size: 1.18rem !important;
+        line-height: 1.35 !important;
+    }
+
+    .model-item {
+        font-size: 0.98rem !important;
+        font-weight: 400 !important;
+    }
+
+    .selected-model {
+        font-size: 1rem !important;
+    }
+
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
 }
 </style>
 """, unsafe_allow_html=True)
 
+# ---------- Header ----------
+st.markdown("""
+<div class="app-card">
+    <div class="utility-tag">SIRPHIRE UTILITY</div>
+    <div class="app-title">Tempered &amp; <span>Back Cover</span> Dashboard</div>
+    <p class="app-subtitle">
+        Search a tempered glass or back cover model and instantly view its location and compatible model list.
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
-PRODUCT_CONFIG = {
-    "Tempered Glass": {
-        "secret_key": "TEMPERED_SHEET_URL",
-        "fallback_secret_key": "SHEET_URL",
-        "type_label": "Display Type",
-        "icon": "🛡️"
-    },
-    "Mobile Cover": {
-        "secret_key": "COVER_SHEET_URL",
-        "fallback_secret_key": None,
-        "type_label": "Cover Type",
-        "icon": "📱"
-    },
-    "Camera Lens Protector": {
-        "secret_key": "LENS_SHEET_URL",
-        "fallback_secret_key": None,
-        "type_label": "Lens Type",
-        "icon": "📷"
-    }
-}
+SHEET_URL = st.secrets.get("SHEET_URL", "")
 
 
-def get_sheet_url(config):
-    url = st.secrets.get(config["secret_key"], "")
-    if not url and config.get("fallback_secret_key"):
-        url = st.secrets.get(config["fallback_secret_key"], "")
-    return url
-
-
-def convert_to_xlsx_export_url(url):
+# ---------- Google Sheet Helpers ----------
+def get_sheet_id(url):
     match = re.search(r"/d/([a-zA-Z0-9-_]+)", url)
-    if not match:
-        return None
+    if match:
+        return match.group(1)
+    return None
 
-    sheet_id = match.group(1)
+
+def excel_export_url(sheet_url):
+    sheet_id = get_sheet_id(sheet_url)
+    if not sheet_id:
+        return sheet_url
     return f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=xlsx"
 
 
-@st.cache_data(ttl=300)
-def load_data(sheet_url):
-    export_url = convert_to_xlsx_export_url(sheet_url)
+def clean_text(value):
+    return str(value).strip() if value is not None else ""
 
-    if not export_url:
-        raise ValueError("Invalid Google Sheet URL")
 
-    compatible_df = pd.read_excel(
-        export_url,
-        sheet_name="compatible modal",
-        header=None
-    )
-
-    all_models_df = pd.read_excel(
-        export_url,
-        sheet_name="All Modals",
-        header=None
-    )
-
-    compatible_df = compatible_df.iloc[:, [1, 2]].copy()
+def make_compatible_df(raw_df, location_col_index=1, compatible_col_index=2):
+    raw_df = raw_df.fillna("")
+    compatible_df = raw_df.iloc[:, [location_col_index, compatible_col_index]].copy()
     compatible_df.columns = ["location", "compatible"]
-
-    all_models_df = all_models_df.iloc[:, [2, 3]].copy()
-    all_models_df.columns = ["model", "type"]
-
-    compatible_df = compatible_df.dropna(subset=["compatible"])
-    all_models_df = all_models_df.dropna(subset=["model"])
 
     compatible_df["location"] = compatible_df["location"].astype(str).str.strip()
     compatible_df["compatible"] = compatible_df["compatible"].astype(str).str.strip()
 
-    all_models_df["model"] = all_models_df["model"].astype(str).str.strip()
-    all_models_df["type"] = all_models_df["type"].astype(str).str.strip()
-
-    return compatible_df, all_models_df
-
-
-def find_matches(search_text, compatible_df):
-    search_text = str(search_text).strip().lower()
-
-    if not search_text:
-        return pd.DataFrame()
-
-    mask = compatible_df["compatible"].str.lower().str.contains(
-        re.escape(search_text),
-        na=False
-    )
-
-    return compatible_df[mask].copy()
-
-
-def get_model_type(search_text, all_models_df):
-    search_text = str(search_text).strip().lower()
-
-    exact_match = all_models_df[
-        all_models_df["model"].str.lower() == search_text
+    compatible_df = compatible_df[
+        (compatible_df["location"] != "") &
+        (compatible_df["compatible"] != "")
     ]
 
-    if not exact_match.empty:
-        return exact_match.iloc[0]["type"]
+    compatible_df = compatible_df[
+        ~compatible_df["location"].str.lower().str.contains("s.no|location|nan", na=False)
+    ]
 
-    partial_match = all_models_df[
-        all_models_df["model"].str.lower().str.contains(
-            re.escape(search_text),
-            na=False
+    compatible_df = compatible_df[
+        ~compatible_df["compatible"].str.lower().str.contains("compatible model names|nan", na=False)
+    ]
+
+    return compatible_df.drop_duplicates().reset_index(drop=True)
+
+
+def make_model_list(raw_df, model_col_index):
+    raw_df = raw_df.fillna("")
+    models = raw_df.iloc[:, model_col_index].astype(str).str.strip()
+    models = models[
+        (models != "") &
+        (~models.str.lower().str.contains("all modals|all models|nan", na=False))
+    ]
+    return sorted(models.drop_duplicates().tolist())
+
+
+def make_display_type_map(raw_df):
+    raw_df = raw_df.fillna("")
+    models_df = raw_df.iloc[:, [2, 3]].copy()
+    models_df.columns = ["model", "display_type"]
+
+    models_df["model"] = models_df["model"].astype(str).str.strip()
+    models_df["display_type"] = models_df["display_type"].astype(str).str.strip()
+
+    models_df = models_df[
+        (models_df["model"] != "") &
+        (~models_df["model"].str.lower().str.contains("all modals|all models|nan", na=False))
+    ]
+
+    return {
+        row["model"].lower(): row["display_type"]
+        for _, row in models_df.drop_duplicates(subset=["model"], keep="first").iterrows()
+        if row["display_type"] and row["display_type"].lower() != "nan"
+    }
+
+
+@st.cache_data(ttl=60)
+def load_data(sheet_url):
+    url = excel_export_url(sheet_url)
+
+    compatible_raw = pd.read_excel(
+        url,
+        sheet_name="compatible modal",
+        header=None,
+        dtype=str,
+        engine="openpyxl"
+    )
+
+    mobile_cover_raw = pd.read_excel(
+        url,
+        sheet_name="Mobile Cover",
+        header=None,
+        dtype=str,
+        engine="openpyxl"
+    )
+
+    models_raw = pd.read_excel(
+        url,
+        sheet_name="All Modals",
+        header=None,
+        dtype=str,
+        engine="openpyxl"
+    )
+
+    # Tempered: compatible modal sheet
+    # Column B = location, Column C = compatible tempered model list
+    tempered_df = make_compatible_df(
+        compatible_raw,
+        location_col_index=1,
+        compatible_col_index=2
+    )
+
+    # Back Cover: Mobile Cover sheet
+    # Column B = location, Column C = compatible back cover model list
+    back_cover_df = make_compatible_df(
+        mobile_cover_raw,
+        location_col_index=1,
+        compatible_col_index=2
+    )
+
+    # All Modals sheet:
+    # Column C = tempered model names
+    # Column G = back cover model names
+    tempered_model_list = make_model_list(models_raw, model_col_index=2)
+    back_cover_model_list = make_model_list(models_raw, model_col_index=6)
+
+    display_type_map = make_display_type_map(models_raw)
+
+    return tempered_df, back_cover_df, tempered_model_list, back_cover_model_list, display_type_map
+
+
+def find_matches(df, search_model):
+    search_model = clean_text(search_model)
+
+    if not search_model:
+        return df.iloc[0:0]
+
+    return df[
+        df["compatible"].astype(str).str.contains(
+            search_model,
+            case=False,
+            na=False,
+            regex=False
         )
     ]
 
-    if not partial_match.empty:
-        return partial_match.iloc[0]["type"]
 
-    return "Not found"
-
-
-def get_all_model_options():
-    models = []
-
-    for product_name, config in PRODUCT_CONFIG.items():
-        sheet_url = get_sheet_url(config)
-
-        if not sheet_url:
-            continue
-
-        try:
-            _, all_models_df = load_data(sheet_url)
-            models.extend(all_models_df["model"].dropna().tolist())
-        except Exception:
-            pass
-
-    clean_models = sorted(
-        list(set([str(model).strip() for model in models if str(model).strip()]))
-    )
-
-    return clean_models
-
-
-def render_product_result(product_name, config, search_text):
-    sheet_url = get_sheet_url(config)
-
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-
+def render_search_section(
+    section_title,
+    df,
+    model_list,
+    placeholder,
+    result_key,
+    show_display_type=False,
+    display_type_map=None
+):
     st.markdown(
-        f'<div class="card-title">{config["icon"]} {product_name}</div>',
+        f'<div class="section-title">{html.escape(section_title)}</div>',
         unsafe_allow_html=True
     )
 
-    if not sheet_url:
-        st.markdown(
-            '<span class="not-found">Sheet link missing</span>',
-            unsafe_allow_html=True
+    col1, col2 = st.columns([2, 1])
+
+    with col1:
+        selected_model = st.selectbox(
+            "Select or search a model",
+            options=[""] + model_list,
+            index=0,
+            key=f"{result_key}_select"
         )
-        st.warning(f"{product_name} ka sheet link Streamlit Secrets me add nahi hai.")
-        st.markdown("</div>", unsafe_allow_html=True)
+
+    with col2:
+        manual_search = st.text_input(
+            "Or type manually",
+            placeholder=placeholder,
+            key=f"{result_key}_manual"
+        )
+
+    search_model = manual_search.strip() if manual_search.strip() else selected_model.strip()
+
+    if not search_model:
+        st.info("Select a model from the dropdown or type it manually.")
         return
 
-    try:
-        compatible_df, all_models_df = load_data(sheet_url)
-    except Exception as e:
-        st.markdown(
-            '<span class="not-found">Sheet error</span>',
-            unsafe_allow_html=True
-        )
-        st.error(f"{product_name} sheet load nahi ho rahi. Tab name ya permission check karo.")
-        st.caption(str(e))
-        st.markdown("</div>", unsafe_allow_html=True)
+    result = find_matches(df, search_model)
+
+    if result.empty:
+        st.warning("No compatible result found.")
         return
 
-    matches = find_matches(search_text, compatible_df)
-    model_type = get_model_type(search_text, all_models_df)
+    locations = sorted(result["location"].astype(str).str.strip().unique())
 
-    if matches.empty:
-        st.markdown(
-            '<span class="not-found">Not Found</span>',
-            unsafe_allow_html=True
-        )
-        st.write("Is model ke liye location nahi mili.")
-        st.markdown("</div>", unsafe_allow_html=True)
-        return
+    all_compatible = []
+    for value in result["compatible"].astype(str):
+        parts = [x.strip() for x in value.split(",") if x.strip()]
+        all_compatible.extend(parts)
 
-    locations = matches["location"].dropna().unique().tolist()
+    all_compatible = sorted(set(all_compatible))
+    location_text = " & ".join(locations)
+
+    safe_search_model = html.escape(search_model)
+    safe_location_text = html.escape(location_text)
+    safe_count = html.escape(str(len(all_compatible)))
+
+    st.success("Result found")
 
     st.markdown(
-        '<span class="found">Available</span>',
+        f"""
+<div class="selected-model">
+    <span class="label">Selected model:</span>
+    <span class="value">{safe_search_model}</span>
+</div>
+""",
         unsafe_allow_html=True
     )
 
+    if show_display_type:
+        display_type = "Not found"
+
+        if display_type_map:
+            display_type = display_type_map.get(search_model.lower(), "Not found")
+
+        safe_display_type = html.escape(str(display_type))
+
+        metric_html = f"""
+<div class="metric-grid">
+    <div class="metric-card location-card">
+        <div class="metric-label">Location</div>
+        <div class="metric-value">{safe_location_text}</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Compatible Count</div>
+        <div class="metric-value">{safe_count}</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Display Type</div>
+        <div class="metric-value">{safe_display_type}</div>
+    </div>
+</div>
+"""
+    else:
+        metric_html = f"""
+<div class="metric-grid">
+    <div class="metric-card location-card">
+        <div class="metric-label">Location</div>
+        <div class="metric-value">{safe_location_text}</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Compatible Count</div>
+        <div class="metric-value">{safe_count}</div>
+    </div>
+</div>
+"""
+
+    st.markdown(metric_html, unsafe_allow_html=True)
+
     st.markdown(
-        f'<div class="location">{", ".join(locations)}</div>',
+        '<div class="section-title">Compatible Model List</div>',
         unsafe_allow_html=True
     )
 
-    c1, c2 = st.columns(2)
+    for model in all_compatible:
+        safe_model = html.escape(model)
+        st.markdown(
+            f'<div class="model-item">{safe_model}</div>',
+            unsafe_allow_html=True
+        )
 
-    with c1:
-        st.metric("Compatible Count", len(matches))
-
-    with c2:
-        st.metric(config["type_label"], model_type)
-
-    with st.expander("Compatible Model List"):
-        for _, row in matches.iterrows():
-            st.write(f"**Location:** {row['location']}")
-            st.write(row["compatible"])
-            st.divider()
-
-    st.markdown("</div>", unsafe_allow_html=True)
+    with st.expander("Matched Rows"):
+        st.dataframe(result, use_container_width=True)
 
 
-st.markdown(
-    """
-    <div style="height: 10px;"></div>
-    <div class="app-title">Sirphire <span>Inventory</span></div>
-    <div class="sub-title">Ek model search karo aur tempered glass, mobile cover, camera lens protector ki location ek saath dekho.</div>
-    """,
-    unsafe_allow_html=True
+# ---------- Load Data ----------
+if not SHEET_URL:
+    st.error("SHEET_URL is missing. Please add your Google Sheet link in Streamlit secrets.")
+    st.stop()
+
+try:
+    (
+        tempered_df,
+        back_cover_df,
+        tempered_model_list,
+        back_cover_model_list,
+        display_type_map
+    ) = load_data(SHEET_URL)
+except Exception as e:
+    st.error("Unable to load Google Sheet data.")
+    st.caption(str(e))
+    st.stop()
+
+
+# ---------- Tempered Search ----------
+render_search_section(
+    section_title="Tempered Compatibility",
+    df=tempered_df,
+    model_list=tempered_model_list,
+    placeholder="Example: Redmi Note 7 Tempered",
+    result_key="tempered",
+    show_display_type=True,
+    display_type_map=display_type_map
 )
 
-model_options = get_all_model_options()
+st.markdown("<br><hr><br>", unsafe_allow_html=True)
 
-st.markdown('<div class="search-box">', unsafe_allow_html=True)
-
-selected_model = st.selectbox(
-    "Model select karo",
-    [""] + model_options
+# ---------- Back Cover Search ----------
+render_search_section(
+    section_title="Back Cover Compatibility",
+    df=back_cover_df,
+    model_list=back_cover_model_list,
+    placeholder="Example: Redmi Note 7 Back Cover",
+    result_key="back_cover",
+    show_display_type=False
 )
-
-manual_search = st.text_input(
-    "Ya model name manually type karo",
-    placeholder="Example: iPhone 13, Vivo Y20, Redmi Note 10..."
-)
-
-st.markdown("</div>", unsafe_allow_html=True)
-
-search_text = manual_search.strip() if manual_search.strip() else selected_model.strip()
-
-if not search_text:
-    st.info("Model select karo ya search box me model name type karo.")
-else:
-    st.subheader(f"Search Result: {search_text}")
-
-    for product_name, config in PRODUCT_CONFIG.items():
-        render_product_result(product_name, config, search_text)
