@@ -11,23 +11,32 @@ st.set_page_config(
 st.markdown("""
 <style>
 .block-container {
-    padding-top: 1.5rem;
+    padding-top: 3rem;
     max-width: 1100px;
 }
+
 .app-title {
     font-size: 42px;
     font-weight: 900;
     color: #111827;
-    line-height: 1.1;
+    line-height: 1.3;
+    padding-top: 8px;
+    margin-top: 10px;
+    overflow: visible;
 }
+
 .app-title span {
     color: #ef4444;
 }
+
 .sub-title {
     color: #6b7280;
     font-size: 17px;
-    margin-top: 8px;
+    margin-top: 10px;
+    margin-bottom: 18px;
 }
+</style>
+""", unsafe_allow_html=True)
 .search-box {
     background: #f9fafb;
     border: 1px solid #e5e7eb;
