@@ -118,17 +118,41 @@ div[data-testid="stButton"] > button {
     width: 100%;
     min-height: 52px;
     border-radius: 12px;
-    border: 1.4px solid #d92d37;
-    background: #ffffff !important;
-    color: #d92d37 !important;
+    border: 1.4px solid #d92d37 !important;
     font-size: 1rem;
     font-weight: 700;
     box-shadow: none !important;
 }
 
-div[data-testid="stButton"] > button:hover {
+/* Not selected button */
+div[data-testid="stButton"] > button[kind="secondary"] {
+    background: #ffffff !important;
+    color: #d92d37 !important;
+}
+
+/* Selected button */
+div[data-testid="stButton"] > button[kind="primary"] {
+    background: #d92d37 !important;
+    color: #ffffff !important;
+    border-color: #d92d37 !important;
+}
+
+div[data-testid="stButton"] > button[kind="primary"] p,
+div[data-testid="stButton"] > button[kind="primary"] span,
+div[data-testid="stButton"] > button[kind="primary"] div {
+    color: #ffffff !important;
+}
+
+/* Hover */
+div[data-testid="stButton"] > button[kind="secondary"]:hover {
     background: #fff4f4 !important;
     color: #b4232c !important;
+    border-color: #b4232c !important;
+}
+
+div[data-testid="stButton"] > button[kind="primary"]:hover {
+    background: #b4232c !important;
+    color: #ffffff !important;
     border-color: #b4232c !important;
 }
 
@@ -635,37 +659,29 @@ if "selected_category" not in st.session_state:
 
 st.markdown('<div class="section-title">Select Category</div>', unsafe_allow_html=True)
 
-selected_category = st.session_state.selected_category
-
-st.markdown(f"""
-<style>
-button[kind="secondary"] {{
-    box-shadow: none !important;
-}}
-
-div[data-testid="column"]:nth-of-type(1) button {{
-    background: {"#d92d37" if selected_category == "tempered" else "#ffffff"} !important;
-    color: {"#ffffff" if selected_category == "tempered" else "#d92d37"} !important;
-    border-color: #d92d37 !important;
-}}
-
-div[data-testid="column"]:nth-of-type(2) button {{
-    background: {"#d92d37" if selected_category == "mobile_cover" else "#ffffff"} !important;
-    color: {"#ffffff" if selected_category == "mobile_cover" else "#d92d37"} !important;
-    border-color: #d92d37 !important;
-}}
-</style>
-""", unsafe_allow_html=True)
-
 btn_col1, btn_col2 = st.columns(2)
 
 with btn_col1:
-    if st.button("Tempered Glass", key="open_tempered", use_container_width=True):
+    tempered_button_type = "primary" if st.session_state.selected_category == "tempered" else "secondary"
+
+    if st.button(
+        "Tempered Glass",
+        key="open_tempered",
+        use_container_width=True,
+        type=tempered_button_type
+    ):
         st.session_state.selected_category = "tempered"
         st.rerun()
 
 with btn_col2:
-    if st.button("Mobile Cover", key="open_mobile_cover", use_container_width=True):
+    mobile_button_type = "primary" if st.session_state.selected_category == "mobile_cover" else "secondary"
+
+    if st.button(
+        "Mobile Cover",
+        key="open_mobile_cover",
+        use_container_width=True,
+        type=mobile_button_type
+    ):
         st.session_state.selected_category = "mobile_cover"
         st.rerun()
 
@@ -692,6 +708,3 @@ elif st.session_state.selected_category == "mobile_cover":
         result_key="back_cover",
         show_display_type=False
     )
-
-else:
-    st.info("Please select Tempered Glass or Mobile Cover to start searching.")
