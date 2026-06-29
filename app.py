@@ -547,7 +547,7 @@ st.markdown("""
     <div class="utility-tag">SIRPHIRE UTILITY</div>
     <div class="app-title">Compatibility <span>Dashboard</span></div>
     <p class="app-subtitle">
-        Select Tempered Glass or Mobile Cover and instantly view location and compatible model list.
+        Select Tempered Glass or Camera Lens and instantly view location and compatible model list.
     </p>
 </div>
 """, unsafe_allow_html=True)
@@ -641,9 +641,9 @@ def load_data(sheet_url):
         engine="openpyxl"
     )
 
-    mobile_cover_raw = pd.read_excel(
+    camera_lens_raw = pd.read_excel(
         url,
-        sheet_name="Mobile Cover",
+        sheet_name="Camera Lens",
         header=None,
         dtype=str,
         engine="openpyxl"
@@ -663,18 +663,18 @@ def load_data(sheet_url):
         compatible_col_index=2
     )
 
-    back_cover_df = make_compatible_df(
-        mobile_cover_raw,
+    camera_lens_df = make_compatible_df(
+        camera_lens_raw,
         location_col_index=1,
         compatible_col_index=2
     )
 
     tempered_model_list = make_model_list(models_raw, model_col_index=2)
-    back_cover_model_list = make_model_list(models_raw, model_col_index=6)
+    camera_lens_model_list = make_model_list(models_raw, model_col_index=6)
 
     display_type_map = make_display_type_map(models_raw)
 
-    return tempered_df, back_cover_df, tempered_model_list, back_cover_model_list, display_type_map
+    return tempered_df, camera_lens_df, tempered_model_list, camera_lens_model_list, display_type_map
 
 def find_matches(df, search_model):
     search_model = clean_text(search_model)
@@ -822,9 +822,9 @@ if not SHEET_URL:
 try:
     (
         tempered_df,
-        back_cover_df,
+        camera_lens_df,
         tempered_model_list,
-        back_cover_model_list,
+        camera_lens_model_list,
         display_type_map
     ) = load_data(SHEET_URL)
 except Exception as e:
@@ -853,15 +853,15 @@ with btn_col1:
         st.rerun()
 
 with btn_col2:
-    mobile_button_type = "primary" if st.session_state.selected_category == "mobile_cover" else "secondary"
+    mobile_button_type = "primary" if st.session_state.selected_category == "camera_lens" else "secondary"
 
     if st.button(
-        "Mobile Cover",
-        key="open_mobile_cover",
+        "Camera Lens",
+        key="open_camera_lens",
         use_container_width=True,
         type=mobile_button_type
     ):
-        st.session_state.selected_category = "mobile_cover"
+        st.session_state.selected_category = "camera_lens"
         st.rerun()
 
 st.markdown("<br>", unsafe_allow_html=True)
@@ -878,12 +878,12 @@ if st.session_state.selected_category == "tempered":
         display_type_map=display_type_map
     )
 
-elif st.session_state.selected_category == "mobile_cover":
+elif st.session_state.selected_category == "camera_lens":
     render_search_section(
-        section_title="Mobile Cover Compatibility",
-        df=back_cover_df,
-        model_list=back_cover_model_list,
-        placeholder="Example: Redmi Note 7 Back Cover",
-        result_key="back_cover",
+        section_title="Camera Lens Compatibility",
+        df=camera_lens_df,
+        model_list=camera_lens_model_list,
+        placeholder="Example: Redmi Note 7 Camera Lens",
+        result_key="camera_lens",
         show_display_type=False
     )
