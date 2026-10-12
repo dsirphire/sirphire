@@ -670,7 +670,7 @@ def load_data(sheet_url):
     )
 
     tempered_model_list = make_model_list(models_raw, model_col_index=2)
-    camera_lens_model_list = make_model_list(models_raw, model_col_index=2)
+    camera_lens_model_list = make_model_list(camera_lens_raw, model_col_index=2)
 
     display_type_map = make_display_type_map(models_raw)
 
@@ -708,12 +708,19 @@ def render_search_section(
     col1, col2 = st.columns([2, 1])
 
     with col1:
+        
+        select_key = f"{result_key}_select"
+        
+        if select_key not in st.session_state or st.session_state[select_key] not in [""] + model_list:
+            st.session_state[select_key] = ""
+        
         selected_model = st.selectbox(
             "Select or search a model",
             options=[""] + model_list,
             index=0,
-            key=f"{result_key}_select"
+            key=select_key
         )
+
 
     with col2:
         manual_search = st.text_input(
