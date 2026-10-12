@@ -606,6 +606,27 @@ def make_model_list(raw_df, model_col_index):
 
     return sorted(models.drop_duplicates().tolist())
 
+def make_camera_lens_model_list(raw_df):
+    raw_df = raw_df.fillna("")
+
+    if raw_df.shape[1] <= 2:
+        return []
+
+    models = []
+
+    for value in raw_df.iloc[:, 2].astype(str):
+        for model in value.split(","):
+            model = model.strip()
+
+            if model and model.lower() not in [
+                "compatible model names",
+                "nan",
+                "none"
+            ]:
+                models.append(model)
+
+    return sorted(set(models), key=str.lower)
+
 def make_display_type_map(raw_df):
     raw_df = raw_df.fillna("")
 
@@ -670,7 +691,7 @@ def load_data(sheet_url):
     )
 
     tempered_model_list = make_model_list(models_raw, model_col_index=2)
-    camera_lens_model_list = make_model_list(camera_lens_raw, model_col_index=2)
+    camera_lens_model_list = make_camera_lens_model_list(camera_lens_raw)
 
     display_type_map = make_display_type_map(models_raw)
 
