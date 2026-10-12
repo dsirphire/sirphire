@@ -670,7 +670,7 @@ def load_data(sheet_url):
     )
 
     tempered_model_list = make_model_list(models_raw, model_col_index=2)
-    camera_lens_model_list = make_model_list(models_raw, model_col_index=6)
+    camera_lens_model_list = make_model_list(models_raw, model_col_index=2)
 
     display_type_map = make_display_type_map(models_raw)
 
