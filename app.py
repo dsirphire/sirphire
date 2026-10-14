@@ -843,6 +843,7 @@ def render_search_section(
         st.dataframe(result, use_container_width=True)
 
 # ---------- Load Data ----------
+load_data.clear()
 if not SHEET_URL:
     st.error("SHEET_URL is missing. Please add your Google Sheet link in Streamlit secrets.")
     st.stop()
